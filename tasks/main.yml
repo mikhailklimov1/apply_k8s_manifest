@@ -1,34 +1,34 @@
 ---
 # tasks file for clear_metadata
-- name: Check if new_cluster_name and new_cluster_name vars ARE NOT defined in a play
+- name: Check if cluster_name and domain_name vars ARE NOT defined in a play
   debug:
     msg: |
         You should define vars new_cluster_name and new_cluster_name
         It is a mandatory requirement
   when: new_cluster_name is not defined and new_domain_name is not defined
 
+- name: Check if manifests_folder var IS NOT defined in a play
+  debug:
+    msg: |
+        You should define var manifests_folder
+        It is a mandatory requirement
+  when: manifests_folder is not defined
+
 - name: Set OC url
   set_fact:
-    api_url: "https://api.{{ new_cluster_name }}.{{ new_domain_name }}:6443"
+    api_url: "https://api.{{ cluster_name }}.{{ domain_name }}:6443"
 
-- name: Authentication attempt
-  k8s_auth:
-    validate_certs: false
-    username: kubeadmin
-    password: "{{ lookup('file', '{{ new_cluster_name }}/auth/kubeadmin-password') }}"
-    host: "{{ api_url }}"
-  register: auth_params
+#- name: Authentication attempt
+#  k8s_auth:
+#    validate_certs: false
+#    username: kubeadmin
+#    password: "{{ lookup('file', '{{ cluster_name }}/auth/kubeadmin-password') }}"
+#    host: "{{ api_url }}"
+#  register: auth_params
 
 - name: Set API token
   set_fact:
-    cluster_token: "{{ auth_params.k8s_auth.api_key }}"
-
-- name: Check if backup_cluster var IS NOT defined in a play
-  debug:
-    msg: |
-        You should define var backup_cluster_name
-        It is a mandatory requirement
-  when: backup_cluster is not defined
+    cluster_token: "{{ api_token }}"
 
 - name: Apply {{ manifest_name }} to {{ api_url }}
   kubernetes.core.k8s:
@@ -36,5 +36,5 @@
     api_key: "{{ cluster_token }}"
     host: "{{ api_url }}"
     state: present
-    src: "{{ backup_cluster }}/backup/{{ manifest_name }}"
+    src: "{{ cluster_name }}/{{ manifests_folder }}/{{ manifest_name }}"
   when: backup_cluster is defined and manifest_name is defined

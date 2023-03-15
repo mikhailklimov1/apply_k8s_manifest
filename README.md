@@ -16,20 +16,18 @@ Role Variables
 
 This role reads and stores data from ansible folder. Each cluster should have it's own folder within ansible folder with a required data. 'backup-cluster-name' should have backup manifests. And 'new-cluster-name' should store authentication data. Example:
 
-├── backup-cluster-name
-│   └── backup
-│       ├── manifest1.yaml
-│       ├── manifest2.yaml
-│       └── manifest3.yaml
+cluster_name/
+├── auth
+│   ├── kubeadmin-password
+│   └── kubeconfig
+└── manifests_folder
+        ├── manifest1.yaml
+        ├── manifest2.yaml
+        └── manifest3.yaml
 
-├── new-cluster-name
-│   └── auth
-│       ├── kubeadmin-password
-│       └── kubeconfig
-
-backup_cluster: An old сluster hostname (eq old cluster folder name)
-new_cluster_name: A new cluster hostname (eq new cluster folder name)
-new_domain_name: A domain name of the new cluster
+cluster_name: A cluster hostname (eq new cluster folder name)
+domain_name: A domain name of the new cluster
+manifests_folder: A directory name where manifests to apply are stored
 manifests: Names of the .yaml files in ./backup-cluster-name/backup folder
 
 Dependencies
@@ -44,9 +42,9 @@ Example Playbook
 
 - hosts: localhost
   vars:
-    backup_cluster: my_old_cluster
-    new_cluster_name: my_new_cluster
-    new_domain_name: example.com
+    cluster_name: cluster_name
+    domain_name: example.com
+    manifests_folder: manifests_folder
     manifests:
     - manifest1.yaml
     - manifest2.yaml
@@ -69,4 +67,3 @@ Author Information
 ------------------
 
 Mikhail Klimov
-git: mikhailklimov1
